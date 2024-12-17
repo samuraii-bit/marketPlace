@@ -2,5 +2,5 @@
 pragma solidity ^0.8.27;
 
 interface IMyERC165 {
-    function supportInterface(bytes4 interfaceID) external view returns (bool);
+    function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }

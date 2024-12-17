@@ -110,7 +110,7 @@ contract MarketPlace is IMarketPlace {
 
     function finishAuction(uint256 _tokenId) public payable ownerOperatorApprovedUserOnly(_tokenId) auctionExists(_tokenId) {
         payable(auctions[_tokenId].seller).transfer(auctions[_tokenId].highestBid);
-        nftContract.safeTransferFrom(address(this), auctions[_tokenId].candidate, _tokenId);
+        nftContract.transferFrom(address(this), auctions[_tokenId].candidate, _tokenId);
 
         emit FinishAuction(msg.sender, _tokenId, auctions[_tokenId].candidate);
 

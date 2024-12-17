@@ -21,9 +21,27 @@ describe("Testing MarketPlace", function() {
     });
 
     it("createItem test: just create an item for marketPlace contract", async function(){
-        const {MarketPlace, users} = await loadFixture(deploy);
+        const {MarketPlace} = await loadFixture(deploy);
         const tx = await MarketPlace.createItem(MarketPlace.target);
         
         await expect(tx).to.emit(MarketPlace, "CreateItem").withArgs(MarketPlace.target);
     });
+
+    
+    it("createItem test: trying to create item for other users[1]", async function(){
+        const {MarketPlace, users} = await loadFixture(deploy);
+        const tx = await MarketPlace.connect(users[1]).createItem(users[1].address);
+        
+        await expect(tx).to.emit(MarketPlace, "CreateItem").withArgs(users[1].address);
+    });
+    
+    
+    it("listItem test: trying to list NFT as owner", async function(){
+        const {MarketPlace, users} = await loadFixture(deploy);
+        await MarketPlace.connect(users[1]).createItem(users[1].address);
+        
+        const tx = MarketPlace.connect(users[1]).listItem(1, 1000);
+        await expect(tx).to.emit(MarketPlace, "ListItem").withArgs(users[1].address, 1, 1000);
+    });
+    
 });
