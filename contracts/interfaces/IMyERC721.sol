@@ -5,6 +5,7 @@ interface IMyERC721 {
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+    event SetMarketPlace(address _from, address _marketPlace);
     //event Mint(address _from, address indexed _to, uint256 _tokenId);
     //event Burn(address indexed _from, address _to, uint256 _tokenId);
 
@@ -19,6 +20,7 @@ interface IMyERC721 {
     function isApprovedForAll(address _owner, address _operator) external view returns (bool);
     function mint(address _to) external;
     function burn(address _to, uint256 _tokenId) external;
+    function setMarketPlace(address _marketPlace) external;
 }
 
 
