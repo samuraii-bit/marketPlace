@@ -13,7 +13,13 @@ task("mint", "Minting an NFT for account")
       const [signer] = await hre.ethers.getSigners();
       const nftContract = await hre.ethers.getContractAt(name, nftContractAddress);
       const tx = await nftContract.connect(signer).createItem(accountAddress);
-      tx.wait();
+      const receipt = await tx.wait();
+
+      if (receipt?.status === 1) {
+          console.log(`NFT successfully minted on ${accountAddress}`);
+      } else {
+          console.error("Transaction failed");
+      };
     });
 
 const config: HardhatUserConfig = {

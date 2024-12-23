@@ -90,19 +90,6 @@ contract MarketPlace is IMarketPlace, IMyERC721TokenReceiver {
     function makeBid(uint256 _tokenId) external payable auctionExists(_tokenId) returns (bool success){
         require(msg.value > auctions[_tokenId].startPrice, "The bid is less than start price of this NFT");
         require(msg.value > auctions[_tokenId].highestBid, "The bid is less than highest bid offered for this NFT");
-        
-        if (block.timestamp >= auctions[_tokenId].startTime + AUCTION_DURATION && auctions[_tokenId].bidsCount <= 2) {
-            if (auctions[_tokenId].bidsCount == 0){ 
-                nftContract.safeTransferFrom(address(this), auctions[_tokenId].seller, _tokenId);
-            }
-            else {
-                nftContract.safeTransferFrom(address(this), auctions[_tokenId].seller, _tokenId);
-                payable(auctions[_tokenId].candidate).transfer(auctions[_tokenId].highestBid);
-            }
-            emit FinishAuction(msg.sender, _tokenId, address(0));
-            delete auctions[_tokenId];
-            return false;
-        }
 
         if (auctions[_tokenId].bidsCount >= 1) {
             payable(auctions[_tokenId].candidate).transfer(auctions[_tokenId].highestBid);

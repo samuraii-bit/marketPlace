@@ -182,55 +182,20 @@ describe("Testing MarketPlace", function() {
         await expect(tx.makeBid(1, {value: 100000})).to.be.revertedWith("Auction doesn't exist");
     });
 
-    it("makeBid test: make 1st bid after 3 days", async function (){
+    it("makeBid test: make bid after auction finished", async function (){
         const {MarketPlace, users, MyERC721} = await loadFixture(deploy);
         await MarketPlace.connect(users[1]).createItem(users[1].address);
         await MarketPlace.connect(users[1]).listItemOnAuction(1, 1000);
+        await MarketPlace.connect(users[2]).makeBid(1, {value: 2000});
+        await MarketPlace.connect(users[3]).makeBid(1, {value: 3000});
+        
         const threeDaysLater = (await time.latest()) + 3 * 24 * 60 * 60;
         await time.increaseTo(threeDaysLater);
+        
+        await MarketPlace.connect(users[1]).finishAuction(1);
+        const tx = await MarketPlace.connect(users[2]);
 
-        const tx = await MarketPlace.connect(users[2]).makeBid(1, {value: 1000000});
-        const receipt = await tx.wait();
-
-        await expect(Boolean(receipt?.status)).to.be.equal(true);
-        await expect(tx).emit(MarketPlace, "FinishAuction").withArgs(users[2].address, 1, ethers.ZeroAddress);
-        await expect((await MarketPlace.auctions(1)).seller).to.be.equal(ethers.ZeroAddress);
-        await expect(await MyERC721.ownerOf(1)).to.be.equal(users[1].address);
-    });
-
-    it("makeBid test: make 2nd bid after 3 days", async function (){
-        const {MarketPlace, users, MyERC721} = await loadFixture(deploy);
-        await MarketPlace.connect(users[1]).createItem(users[1].address);
-        await MarketPlace.connect(users[1]).listItemOnAuction(1, 1000);
-        await MarketPlace.connect(users[2]).makeBid(1, {value: 1001});
-        const threeDaysLater = (await time.latest()) + 3 * 24 * 60 * 60;
-        await time.increaseTo(threeDaysLater);
-
-        const tx = await MarketPlace.connect(users[3]).makeBid(1, {value: 1000000});
-        const receipt = await tx.wait();
-
-        await expect(Boolean(receipt?.status)).to.be.equal(true);
-        await expect(tx).emit(MarketPlace, "FinishAuction").withArgs(users[3].address, 1, ethers.ZeroAddress);
-        await expect((await MarketPlace.auctions(1)).seller).to.be.equal(ethers.ZeroAddress);
-        await expect(await MyERC721.ownerOf(1)).to.be.equal(users[1].address);
-    });
-
-    it("makeBid test: make 3rd bid after 3 days", async function (){
-        const {MarketPlace, users, MyERC721} = await loadFixture(deploy);
-        await MarketPlace.connect(users[1]).createItem(users[1].address);
-        await MarketPlace.connect(users[1]).listItemOnAuction(1, 1000);
-        await MarketPlace.connect(users[2]).makeBid(1, {value: 1001});
-        await MarketPlace.connect(users[3]).makeBid(1, {value: 1010});
-        const threeDaysLater = (await time.latest()) + 3 * 24 * 60 * 60;
-        await time.increaseTo(threeDaysLater);
-
-        const tx = await MarketPlace.connect(users[4]).makeBid(1, {value: 1000000});
-        const receipt = await tx.wait();
-
-        await expect(Boolean(receipt?.status)).to.be.equal(true);
-        await expect((await MarketPlace.auctions(1)).seller).to.be.equal(ethers.ZeroAddress);
-        await expect(tx).emit(MarketPlace, "FinishAuction").withArgs(users[4].address, 1, ethers.ZeroAddress);
-        await expect(await MyERC721.ownerOf(1)).to.be.equal(users[1].address);
+        await expect(tx.makeBid(1, {value: 100000})).to.be.revertedWith("Auction doesn't exist");
     });
 
     it("makeBid test: make 4th bid after 3 days", async function (){
